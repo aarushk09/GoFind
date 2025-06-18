@@ -23,7 +23,7 @@ export default function Home() {
             </span>
           </h2>
           <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find what you're looking for quickly and efficiently.
+            Find what you are looking for quickly and efficiently.
           </p>
         </div>
 
