@@ -1,6 +1,14 @@
-# GoFind
+# GoFind - AI Scavenger Hunt Platform
 
-A modern search and discovery application built with Next.js and Supabase.
+An interactive AI-powered scavenger hunt platform similar to Kahoot, but for real-world exploration and discovery. Create engaging hunt rooms where players compete to solve clues and complete challenges.
+
+## Features
+
+- 🎯 **Create Hunt Rooms**: Set up interactive scavenger hunt rooms with custom challenges
+- 🤖 **AI-Powered Clues**: Intelligent hints that adapt to player progress and location
+- 🏃‍♂️ **Real-time Competition**: Live leaderboards and instant feedback
+- 📊 **Host Dashboard**: Comprehensive analytics and room management
+- 🔐 **Secure Authentication**: Email-based authentication for hunt hosts
 
 ## Getting Started
 
@@ -41,6 +49,22 @@ You'll need to set up the following environment variables in your `.env.local` f
 - **Styling**: Tailwind CSS
 - **Database**: Supabase
 - **Authentication**: Supabase Auth
+- **Real-time**: Supabase Realtime (planned)
+
+## How It Works
+
+### For Hunt Hosts
+1. **Sign Up**: Create a host account to start building hunts
+2. **Create Hunts**: Design custom scavenger hunts with AI-powered clues
+3. **Launch Rooms**: Create live rooms for players to join
+4. **Monitor Progress**: Track player progress in real-time
+5. **Analyze Results**: Review performance and engagement metrics
+
+### For Players
+1. **Join Room**: Enter a room code to join an active hunt
+2. **Solve Clues**: Work through AI-generated challenges and hints
+3. **Compete**: Compete with other players on live leaderboards
+4. **Explore**: Discover new locations and complete real-world tasks
 
 ## Learn More
 
