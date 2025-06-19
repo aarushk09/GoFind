@@ -3,17 +3,38 @@
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { getHostRooms } from '@/services/roomService'
+import { Room } from '@/types/room'
 
 export default function DashboardPage() {
   const { user, signOut, loading } = useAuth()
   const router = useRouter()
+  const [rooms, setRooms] = useState<Room[]>([])
+  const [roomsLoading, setRoomsLoading] = useState(false)
+  const [roomsError, setRoomsError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loading && !user) {
       router.push('/auth/login')
     }
   }, [user, loading, router])
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      if (!user) return
+      setRoomsLoading(true)
+      setRoomsError(null)
+      const result = await getHostRooms(user.id)
+      if (result.error) {
+        setRoomsError(result.error)
+      } else if (result.rooms) {
+        setRooms(result.rooms)
+      }
+      setRoomsLoading(false)
+    }
+    if (user) fetchRooms()
+  }, [user])
 
   const handleSignOut = async () => {
     await signOut()
@@ -55,8 +76,33 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-      </nav>      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      </nav>
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
+          <h2 className="text-2xl font-bold mb-4">Your Hunt Rooms</h2>
+          {roomsLoading ? (
+            <div>Loading rooms...</div>
+          ) : roomsError ? (
+            <div className="text-red-500">{roomsError}</div>
+          ) : rooms.length === 0 ? (
+            <div className="text-gray-500">No rooms created yet.</div>
+          ) : (
+            <ul className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {rooms.map(room => (
+                <li key={room.room_code} className="bg-white rounded-lg shadow p-4 border border-purple-100 hover:shadow-lg transition">
+                  <Link href={`/host/room/${room.room_code}`} className="block">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-lg font-bold tracking-widest text-purple-700">{room.room_code}</span>
+                      <span className="text-xs text-gray-500">{room.status}</span>
+                    </div>
+                    <div className="mt-2 text-gray-900 font-semibold">{room.metadata?.title || 'Untitled Hunt'}</div>
+                    <div className="text-gray-500 text-sm">{room.metadata?.description}</div>
+                    <div className="text-xs text-gray-400 mt-1">Created: {new Date(room.created_at).toLocaleString()}</div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white overflow-hidden shadow-lg rounded-xl border border-purple-100">
               <div className="p-6">
@@ -124,7 +170,8 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
-            </div>            <div className="bg-white overflow-hidden shadow-lg rounded-xl border border-green-100">
+            </div>
+            <div className="bg-white overflow-hidden shadow-lg rounded-xl border border-green-100">
               <div className="p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -157,7 +204,8 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-          </div>          <div className="mt-8">
+          </div>
+          <div className="mt-8">
             <div className="bg-white shadow-lg rounded-xl border border-gray-100">
               <div className="px-6 py-8 sm:p-8">
                 <h3 className="text-2xl leading-6 font-bold text-gray-900 mb-2">
@@ -165,7 +213,8 @@ export default function DashboardPage() {
                 </h3>
                 <div className="mt-2 max-w-2xl text-base text-gray-600">
                   <p>Welcome to your hunt host dashboard! Start creating engaging AI-powered scavenger hunts that will challenge and delight your players.</p>
-                </div>                <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                </div>
+                <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <Link
                     href="/host/create"
                     className="relative group block w-full border-2 border-purple-200 border-dashed rounded-xl p-8 text-center hover:border-purple-400 hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200"
@@ -216,7 +265,7 @@ export default function DashboardPage() {
                     </span>
                   </button>
                 </div>
-                
+
                 <div className="mt-8 pt-6 border-t border-gray-200">
                   <h4 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h4>
                   <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
