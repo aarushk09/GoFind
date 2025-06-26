@@ -1,3 +1,130 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Avatar System Styles */
+.avatar-svg {
+  transition: all 0.3s ease;
+  border-radius: 50%;
+}
+
+.avatar-container {
+  display: inline-block;
+  position: relative;
+}
+
+.avatar-animated .avatar-svg {
+  animation: avatarPulse 2s ease-in-out infinite;
+}
+
+.avatar-selected .avatar-svg {
+  box-shadow: 0 0 20px rgba(74, 144, 226, 0.4);
+}
+
+.avatar-container:hover .avatar-svg {
+  transform: scale(1.05);
+}
+
+@keyframes avatarPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes avatarGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px rgba(74, 144, 226, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(74, 144, 226, 0.6));
+  }
+}
+
+.avatar-selector {
+  padding: 1rem;
+}
+
+.avatar-option {
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.avatar-option:hover {
+  background-color: rgba(74, 144, 226, 0.05);
+  border-color: rgba(74, 144, 226, 0.2);
+}
+
+.avatar-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.avatar-card:hover {
+  transform: translateY(-4px);
+}
+
+.avatar-list-item {
+  transition: all 0.2s ease;
+}
+
+.avatar-list-item:hover {
+  transform: translateX(4px);
+}
+
+/* Avatar Gallery Animations */
+.avatar-gallery .avatar-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.avatar-gallery .avatar-card:nth-child(1) { animation-delay: 0.1s; }
+.avatar-gallery .avatar-card:nth-child(2) { animation-delay: 0.2s; }
+.avatar-gallery .avatar-card:nth-child(3) { animation-delay: 0.3s; }
+.avatar-gallery .avatar-card:nth-child(4) { animation-delay: 0.4s; }
+.avatar-gallery .avatar-card:nth-child(5) { animation-delay: 0.5s; }
+.avatar-gallery .avatar-card:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Avatar Sizes */
+@media (max-width: 640px) {
+  .avatar-selector .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .avatar-selector .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Custom Scrollbar for Avatar Gallery */
+.avatar-gallery::-webkit-scrollbar {
+  width: 8px;
+}
+
+.avatar-gallery::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.avatar-gallery::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.avatar-gallery::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
