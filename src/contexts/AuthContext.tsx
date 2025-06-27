@@ -2,8 +2,33 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
-import { AuthState, User, LoginCredentials, SignUpCredentials } from '../types/auth'
-import { Session } from '@supabase/supabase-js'
+import { User as SupabaseUser, Session } from '@supabase/supabase-js'
+
+interface User {
+  id: string
+  email: string
+  created_at: string
+  user_metadata?: {
+    name?: string
+    role?: string
+  }
+}
+
+interface AuthState {
+  user: User | null
+  session: Session | null
+  loading: boolean
+  error: string | null
+}
+
+interface LoginCredentials {
+  email: string
+  password: string
+}
+
+interface SignUpCredentials extends LoginCredentials {
+  name?: string
+}
 
 interface AuthContextType extends AuthState {
   signIn: (credentials: LoginCredentials) => Promise<{ error?: string }>
@@ -27,85 +52,91 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    session: null,
-    loading: true,
-    error: null,
-  })
+  const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Check if required environment variables are present
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      setState(prev => ({ 
-        ...prev, 
-        loading: false, 
-        error: 'Supabase configuration is missing. Please check your environment variables.' 
-      }))
-      return
-    }
+    let mounted = true
 
-    // Get initial session
-    const getInitialSession = async () => {
+    const initializeAuth = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession()
+        console.log('🔐 Initializing auth...')
+        
+        // Get initial session
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession()
         
         if (error) {
-          console.error('Error getting session:', error)
-          setState(prev => ({ ...prev, loading: false, error: error.message }))
+          console.error('❌ Error getting session:', error)
+          if (mounted) {
+            setError(error.message)
+            setLoading(false)
+          }
           return
         }
 
-        setState(prev => ({
-          ...prev,
-          session: session ? {
-            access_token: session.access_token,
-            refresh_token: session.refresh_token || '',
-            expires_at: session.expires_at || 0,
-            user: session.user as User
-          } : null,
-          user: session?.user as User || null,
-          loading: false,
-          error: null,
-        }))
-      } catch (error) {
-        console.error('Unexpected error getting session:', error)
-        setState(prev => ({ 
-          ...prev, 
-          loading: false, 
-          error: 'Failed to load authentication state' 
-        }))
+        console.log('📋 Initial session check:', initialSession ? '✅ Found' : '❌ Not found')
+        
+        if (mounted && initialSession) {
+          const userData = initialSession.user as User
+          console.log('👤 Setting user:', userData.email)
+          setUser(userData)
+          setSession(initialSession)
+        }
+        
+        if (mounted) {
+          setLoading(false)
+          setError(null)
+        }
+
+      } catch (err) {
+        console.error('💥 Unexpected error during auth init:', err)
+        if (mounted) {
+          setError('Failed to initialize authentication')
+          setLoading(false)
+        }
       }
     }
 
-    getInitialSession()
+    // Initialize auth
+    initializeAuth()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event)
+      (event, newSession) => {
+        console.log('🔄 Auth state changed:', event)
         
-        setState(prev => ({
-          ...prev,
-          session: session ? {
-            access_token: session.access_token,
-            refresh_token: session.refresh_token || '',
-            expires_at: session.expires_at || 0,
-            user: session.user as User
-          } : null,
-          user: session?.user as User || null,
-          loading: false,
-          error: null,
-        }))
+        if (!mounted) return
+
+        if (newSession) {
+          const userData = newSession.user as User
+          console.log('✅ User authenticated:', userData.email)
+          setUser(userData)
+          setSession(newSession)
+        } else {
+          console.log('❌ User signed out')
+          setUser(null)
+          setSession(null)
+        }
+        
+        setLoading(false)
+        setError(null)
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const signIn = async (credentials: LoginCredentials) => {
     try {
-      setState(prev => ({ ...prev, loading: true, error: null }))
+      setLoading(true)
+      setError(null)
+      
+      console.log('🔑 Attempting sign in for:', credentials.email)
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
@@ -113,23 +144,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
       })
 
       if (error) {
-        setState(prev => ({ ...prev, loading: false, error: error.message }))
+        console.error('❌ Sign in failed:', error.message)
+        setError(error.message)
+        setLoading(false)
         return { error: error.message }
       }
 
-      // State will be updated automatically via onAuthStateChange
-      setState(prev => ({ ...prev, loading: false }))
+      console.log('✅ Sign in successful')
+      // Auth state will be updated by the listener
       return {}
-    } catch (error) {
+    } catch (err) {
+      console.error('💥 Unexpected sign in error:', err)
       const errorMessage = 'An unexpected error occurred during sign in'
-      setState(prev => ({ ...prev, loading: false, error: errorMessage }))
+      setError(errorMessage)
+      setLoading(false)
       return { error: errorMessage }
     }
   }
 
   const signUp = async (credentials: SignUpCredentials) => {
     try {
-      setState(prev => ({ ...prev, loading: true, error: null }))
+      setLoading(true)
+      setError(null)
+      
+      console.log('📝 Attempting sign up for:', credentials.email)
       
       const { data, error } = await supabase.auth.signUp({
         email: credentials.email,
@@ -137,51 +175,50 @@ export function AuthProvider({ children }: AuthProviderProps) {
         options: {
           data: {
             name: credentials.name,
-            role: 'host', // Default role for new signups
+            role: 'host',
           },
         },
       })
 
       if (error) {
-        setState(prev => ({ ...prev, loading: false, error: error.message }))
+        console.error('❌ Sign up failed:', error.message)
+        setError(error.message)
+        setLoading(false)
         return { error: error.message }
       }
 
-      setState(prev => ({ ...prev, loading: false }))
+      console.log('✅ Sign up successful')
+      setLoading(false)
       return {}
-    } catch (error) {
+    } catch (err) {
+      console.error('💥 Unexpected sign up error:', err)
       const errorMessage = 'An unexpected error occurred during sign up'
-      setState(prev => ({ ...prev, loading: false, error: errorMessage }))
+      setError(errorMessage)
+      setLoading(false)
       return { error: errorMessage }
     }
   }
 
   const signOut = async () => {
     try {
-      setState(prev => ({ ...prev, loading: true, error: null }))
+      setLoading(true)
+      console.log('🚪 Signing out...')
       
       const { error } = await supabase.auth.signOut()
       
       if (error) {
-        console.error('Error signing out:', error)
-        setState(prev => ({ ...prev, loading: false, error: error.message }))
+        console.error('❌ Sign out failed:', error.message)
+        setError(error.message)
+        setLoading(false)
         return
       }
 
-      // Clear local state
-      setState({
-        user: null,
-        session: null,
-        loading: false,
-        error: null,
-      })
-    } catch (error) {
-      console.error('Unexpected error during sign out:', error)
-      setState(prev => ({ 
-        ...prev, 
-        loading: false, 
-        error: 'Failed to sign out' 
-      }))
+      console.log('✅ Sign out successful')
+      // Auth state will be updated by the listener
+    } catch (err) {
+      console.error('💥 Unexpected sign out error:', err)
+      setError('Failed to sign out')
+      setLoading(false)
     }
   }
 
@@ -196,13 +233,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       return {}
-    } catch (error) {
+    } catch (err) {
       return { error: 'An unexpected error occurred while resetting password' }
     }
   }
 
   const value: AuthContextType = {
-    ...state,
+    user,
+    session,
+    loading,
+    error,
     signIn,
     signUp,
     signOut,
@@ -211,3 +251,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

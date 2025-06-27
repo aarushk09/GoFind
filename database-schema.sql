@@ -75,45 +75,41 @@ CREATE INDEX IF NOT EXISTS idx_player_progress_challenge_id ON player_progress(c
 CREATE INDEX IF NOT EXISTS idx_player_progress_status ON player_progress(status);
 
 -- Create unique constraint to prevent duplicate progress entries
-ALTER TABLE player_progress ADD CONSTRAINT unique_player_challenge 
-UNIQUE (player_id, challenge_id);
-
--- Enable Row Level Security (RLS) for all tables
-ALTER TABLE rooms ENABLE ROW LEVEL SECURITY;
-ALTER TABLE players ENABLE ROW LEVEL SECURITY;
-ALTER TABLE hunt_challenges ENABLE ROW LEVEL SECURITY;
-ALTER TABLE player_progress ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE player_progress ADD CONSTRAINT unique_player_challenge 
+-- UNIQUE (player_id, challenge_id);
 
 -- RLS Policies for rooms table
-CREATE POLICY "Hosts can manage their own rooms" ON rooms
-    FOR ALL USING (auth.uid()::uuid = host_id);
+-- CREATE POLICY "Hosts can manage their own rooms" ON rooms
+--     FOR ALL USING (auth.uid()::uuid = host_id);
 
-CREATE POLICY "Anyone can read room basic info by room code" ON rooms
-    FOR SELECT USING (true);
+-- CREATE POLICY "Anyone can read room basic info by room code" ON rooms
+--     FOR SELECT USING (true);
 
 -- RLS Policies for players table  
-CREATE POLICY "Players can read players in their room" ON players
+-- Allow hosts to read all players in their rooms
+CREATE POLICY "Host can read all players in their rooms" ON players
     FOR SELECT USING (
-        room_code IN (
-            SELECT room_code FROM rooms WHERE auth.uid()::uuid = host_id
-            UNION
-            SELECT room_code FROM players WHERE auth.uid()::uuid = id
-        )
-    );
-
-CREATE POLICY "Anyone can insert as player" ON players
-    FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Players can update their own data" ON players
-    FOR UPDATE USING (auth.uid()::uuid = id);
-
--- RLS Policies for hunt_challenges table
-CREATE POLICY "Hosts can manage challenges in their rooms" ON hunt_challenges
-    FOR ALL USING (
         room_code IN (SELECT room_code FROM rooms WHERE auth.uid()::uuid = host_id)
     );
 
-CREATE POLICY "Players can read challenges in their room" ON hunt_challenges
+-- Allow anyone to insert new players (for joining rooms)
+CREATE POLICY "Anyone can insert as player" ON players
+    FOR INSERT WITH CHECK (true);
+
+-- Allow anyone to read players in a room (needed for player lists)
+CREATE POLICY "Anyone can read players in a room" ON players
+    FOR SELECT USING (true);
+
+-- CREATE POLICY "Players can update their own data" ON players
+--     FOR UPDATE USING (auth.uid()::uuid = id);
+
+-- RLS Policies for hunt_challenges table= string; 
+-- CREATE POLICY "Hosts can manage challenges in their rooms" ON hunt_challenges
+--     FOR ALL USING (YType 
+--         room_code IN (SELECT room_code FROM rooms WHERE auth.uid()::uuid = host_id)
+--     );
+
+-- CREATE POLICY "Players can read challenges in their room" ON hunt_challenges
     FOR SELECT USING (
         room_code IN (SELECT room_code FROM players WHERE auth.uid()::uuid = id)
     );

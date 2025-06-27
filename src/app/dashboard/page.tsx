@@ -15,12 +15,6 @@ export default function DashboardPage() {
   const [roomsError, setRoomsError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push('/auth/login')
-    }
-  }, [user, loading, router])
-
-  useEffect(() => {
     const fetchRooms = async () => {
       if (!user) return
       setRoomsLoading(true)
@@ -33,7 +27,7 @@ export default function DashboardPage() {
       }
       setRoomsLoading(false)
     }
-    if (user) fetchRooms()
+    fetchRooms()
   }, [user])
 
   const handleSignOut = async () => {
@@ -41,6 +35,7 @@ export default function DashboardPage() {
     router.push('/')
   }
 
+  // Show loading spinner while auth is initializing
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -49,9 +44,12 @@ export default function DashboardPage() {
     )
   }
 
+  // Redirect to login if not authenticated
   if (!user) {
-    return null // Will redirect to login
+    router.push('/auth/login')
+    return null
   }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
       <nav className="bg-white shadow-sm border-b border-purple-100">
@@ -67,6 +65,12 @@ export default function DashboardPage() {
               <span className="text-sm text-gray-700">
                 Welcome, {user.user_metadata?.name || user.email}
               </span>
+              <Link href="/profile" className="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                Profile
+              </Link>
+              <Link href="/shop" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                Shop
+              </Link>
               <button
                 onClick={handleSignOut}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
@@ -295,3 +299,4 @@ export default function DashboardPage() {
     </div>
   )
 }
+
