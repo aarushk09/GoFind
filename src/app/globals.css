@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark theme customizations */
+:root {
+  --color-primary: #8B5CF6;
+  --color-primary-dark: #7C3AED;
+  --color-bg-dark: #111827;
+  --color-bg-secondary: #1F2937;
+  --color-text-primary: #F9FAFB;
+  --color-text-secondary: #D1D5DB;
+}
+
 /* Avatar System Styles */
 .avatar-svg {
   transition: all 0.3s ease;

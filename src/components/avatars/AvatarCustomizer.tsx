@@ -31,14 +31,14 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
   };
 
   return (
-    <div className={`avatar-customizer bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto ${className}`}>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+    <div className={`avatar-customizer bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-6 max-w-2xl mx-auto ${className}`}>
+      <h2 className="text-2xl font-bold text-white mb-6 text-center">
         Customize Your Avatar
       </h2>
 
       {/* Preview Section */}
       <div className="avatar-preview mb-8 text-center">
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-8 mb-4">
+        <div className="bg-gray-700 border border-gray-600 rounded-lg p-8 mb-4">
           <Avatar 
             avatarId={selectedAvatarId} 
             size={previewSize}
@@ -47,7 +47,7 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
         </div>
         
         <div className="flex items-center justify-center space-x-4 mb-4">
-          <label className="text-sm text-gray-600">Preview Size:</label>
+          <label className="text-sm text-gray-300">Preview Size:</label>
           <input
             type="range"
             min="80"
@@ -56,20 +56,20 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
             onChange={(e) => setPreviewSize(Number(e.target.value))}
             className="w-24"
           />
-          <span className="text-sm text-gray-500">{previewSize}px</span>
+          <span className="text-sm text-gray-400">{previewSize}px</span>
         </div>
 
         {selectedAvatarData && (
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-gray-800">{selectedAvatarData.name}</h3>
-            <p className="text-sm text-gray-600">{selectedAvatarData.description}</p>
+            <h3 className="text-lg font-semibold text-white">{selectedAvatarData.name}</h3>
+            <p className="text-sm text-gray-300">{selectedAvatarData.description}</p>
           </div>
         )}
       </div>
 
       {/* Display Name Input */}
       <div className="mb-6">
-        <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="displayName" className="block text-sm font-medium text-gray-300 mb-2">
           Display Name
         </label>
         <input
@@ -78,23 +78,23 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
           placeholder="Enter your display name..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
           maxLength={20}
         />
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-400 mt-1">
           {displayName.length}/20 characters
         </p>
       </div>
 
       {/* Avatar Selection */}
       <div className="mb-8">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Choose Your Avatar</h3>
+        <h3 className="text-lg font-medium text-white mb-4">Choose Your Avatar</h3>
         <AvatarSelector
           selectedAvatarId={selectedAvatarId}
           onAvatarSelect={setSelectedAvatarId}
           size={60}
           showNames={true}
-          className="border border-gray-200 rounded-lg p-4"
+          className="border border-gray-600 bg-gray-700 rounded-lg p-4"
         />
       </div>
 
@@ -103,7 +103,7 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
         {onCancel && (
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+            className="px-4 py-2 text-gray-300 bg-gray-700 border border-gray-600 rounded-md hover:bg-gray-600 transition-colors"
           >
             Cancel
           </button>
@@ -113,8 +113,8 @@ export const AvatarCustomizer: React.FC<AvatarCustomizerProps> = ({
           disabled={!displayName.trim()}
           className={`px-6 py-2 rounded-md font-medium transition-colors ${
             displayName.trim()
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              ? 'bg-purple-600 text-white hover:bg-purple-700'
+              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
           }`}
         >
           Save Avatar

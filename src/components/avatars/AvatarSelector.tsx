@@ -27,7 +27,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
         {avatarList.map((avatar) => (
           <div
             key={avatar.id}
-            className="avatar-option flex flex-col items-center p-2 rounded-lg transition-all duration-300 hover:bg-gray-50"
+            className="avatar-option flex flex-col items-center p-2 rounded-lg transition-all duration-300 hover:bg-gray-600"
             onMouseEnter={() => setHoveredAvatar(avatar.id)}
             onMouseLeave={() => setHoveredAvatar(null)}
           >
@@ -40,12 +40,12 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
               className="mb-2"
             />
             {showNames && (
-              <h3 className="text-sm font-medium text-gray-800 text-center">
+              <h3 className="text-sm font-medium text-white text-center">
                 {avatar.name}
               </h3>
             )}
             {showDescriptions && (
-              <p className="text-xs text-gray-600 text-center mt-1">
+              <p className="text-xs text-gray-300 text-center mt-1">
                 {avatar.description}
               </p>
             )}

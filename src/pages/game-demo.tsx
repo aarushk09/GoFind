@@ -123,10 +123,10 @@ export default function GameDemo() {
   const renderOverview = () => (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-4xl font-bold text-white mb-4">
           Game System Demo
         </h1>
-        <p className="text-xl text-gray-600 mb-8">
+        <p className="text-xl text-gray-300 mb-8">
           Experience our interactive challenge system with AI validation
         </p>
       </div>
@@ -135,10 +135,12 @@ export default function GameDemo() {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
           <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-            <span className="text-2xl">🎯</span>
+            <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z" clipRule="evenodd" />
+            </svg>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Challenge System</h3>
-          <p className="text-gray-600 text-sm mb-4">
+          <h3 className="text-lg font-semibold text-white mb-2">Challenge System</h3>
+          <p className="text-gray-300 text-sm mb-4">
             AI-powered challenges with photo validation, location tracking, and smart scoring
           </p>
           <button
@@ -151,7 +153,9 @@ export default function GameDemo() {
 
         <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
           <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-            <span className="text-2xl">📱</span>
+            <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+            </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Interactive Cards</h3>
           <p className="text-gray-600 text-sm mb-4">
@@ -170,7 +174,9 @@ export default function GameDemo() {
 
         <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
           <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-            <span className="text-2xl">🎮</span>
+            <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clipRule="evenodd" />
+            </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Full Game Experience</h3>
           <p className="text-gray-600 text-sm mb-4">
@@ -186,21 +192,21 @@ export default function GameDemo() {
       </div>
 
       {/* Technology Showcase */}
-      <div className="bg-gray-50 rounded-lg p-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+      <div className="bg-gray-800 border border-gray-700 rounded-lg p-8">
+        <h2 className="text-2xl font-bold text-white mb-6 text-center">
           Advanced Game Features
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { name: 'AI Validation', desc: 'Smart answer checking', icon: '🤖' },
-            { name: 'Photo Recognition', desc: 'Computer vision validation', icon: '📸' },
-            { name: 'GPS Integration', desc: 'Location-based challenges', icon: '📍' },
-            { name: 'Real-time Updates', desc: 'Live progress tracking', icon: '⚡' }
+            { name: 'AI Validation', desc: 'Smart answer checking', component: <svg className="w-8 h-8 text-red-600 mx-auto" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633z" clipRule="evenodd" /></svg> },
+            { name: 'Photo Recognition', desc: 'Computer vision validation', component: <svg className="w-8 h-8 text-orange-600 mx-auto" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" /></svg> },
+            { name: 'GPS Integration', desc: 'Location-based challenges', component: <svg className="w-8 h-8 text-green-600 mx-auto" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg> },
+            { name: 'Real-time Updates', desc: 'Live progress tracking', component: <svg className="w-8 h-8 text-blue-600 mx-auto" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" /></svg> }
           ].map((feature) => (
             <div key={feature.name} className="text-center">
-              <div className="text-3xl mb-2">{feature.icon}</div>
-              <h3 className="font-semibold text-gray-900">{feature.name}</h3>
-              <p className="text-sm text-gray-600">{feature.desc}</p>
+              <div className="mb-2">{feature.component}</div>
+              <h3 className="font-semibold text-white">{feature.name}</h3>
+              <p className="text-sm text-gray-300">{feature.desc}</p>
             </div>
           ))}
         </div>
@@ -211,15 +217,15 @@ export default function GameDemo() {
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Challenge Types</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
-            { type: 'Photo', icon: '📸', desc: 'Take photos of specific objects or locations' },
-            { type: 'Location', icon: '📍', desc: 'Navigate to GPS coordinates' },
-            { type: 'Text', icon: '✏️', desc: 'Answer questions or solve riddles' },
-            { type: 'QR Code', icon: '📱', desc: 'Scan hidden QR codes' },
-            { type: 'AI Prompt', icon: '🤖', desc: 'Solve AI-generated challenges' },
-            { type: 'Mixed', icon: '🎯', desc: 'Combination of multiple types' }
+            { type: 'Photo', component: <svg className="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" /></svg>, desc: 'Take photos of specific objects or locations' },
+            { type: 'Location', component: <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>, desc: 'Navigate to GPS coordinates' },
+            { type: 'Text', component: <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" /></svg>, desc: 'Answer questions or solve riddles' },
+            { type: 'QR Code', component: <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4z" clipRule="evenodd" /></svg>, desc: 'Scan hidden QR codes' },
+            { type: 'AI Prompt', component: <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633z" clipRule="evenodd" /></svg>, desc: 'Solve AI-generated challenges' },
+            { type: 'Mixed', component: <svg className="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4z" clipRule="evenodd" /></svg>, desc: 'Combination of multiple types' }
           ].map((challenge) => (
             <div key={challenge.type} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <span className="text-2xl">{challenge.icon}</span>
+              <div className="flex-shrink-0">{challenge.component}</div>
               <div>
                 <h3 className="font-semibold text-gray-900">{challenge.type}</h3>
                 <p className="text-sm text-gray-600">{challenge.desc}</p>
@@ -398,7 +404,7 @@ export default function GameDemo() {
 
   return (
     <ToastProvider position="top-right">
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-900">
         {currentView !== 'overview' && renderNavigationHeader()}
         
         <div className="py-8 px-4">

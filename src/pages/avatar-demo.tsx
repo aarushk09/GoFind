@@ -30,14 +30,14 @@ export default function AvatarDemo() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gray-900 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-white mb-4">
             GoFind Avatar System
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-300 max-w-2xl mx-auto">
             A comprehensive avatar system with 6 hand-crafted SVG characters, 
             complete customization options, and seamless integration capabilities.
           </p>
@@ -45,7 +45,7 @@ export default function AvatarDemo() {
 
         {/* Current Selection Display */}
         {isAvatarSelected && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-md p-6 mb-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <AvatarDisplay
@@ -76,13 +76,13 @@ export default function AvatarDemo() {
 
         {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
-          <div className="flex rounded-lg border border-gray-300 overflow-hidden shadow-sm">
+          <div className="flex rounded-lg border border-gray-600 overflow-hidden shadow-sm">
             <button
               onClick={() => setActiveTab('gallery')}
               className={`px-6 py-3 text-sm font-medium transition-colors ${
                 activeTab === 'gallery'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
               Gallery
@@ -91,8 +91,8 @@ export default function AvatarDemo() {
               onClick={() => setActiveTab('customizer')}
               className={`px-6 py-3 text-sm font-medium transition-colors ${
                 activeTab === 'customizer'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
               Customizer
@@ -101,8 +101,8 @@ export default function AvatarDemo() {
               onClick={() => setActiveTab('showcase')}
               className={`px-6 py-3 text-sm font-medium transition-colors ${
                 activeTab === 'showcase'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
               Showcase
@@ -130,15 +130,15 @@ export default function AvatarDemo() {
           {activeTab === 'showcase' && (
             <div className="space-y-8">
               {/* Different Display Variants */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-md p-6">
+                <h3 className="text-xl font-semibold text-white mb-6">
                   Avatar Display Variants
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {selectedAvatar && (
                     <>
                       <div className="text-center">
-                        <h4 className="text-sm font-medium text-gray-700 mb-3">Simple</h4>
+                        <h4 className="text-sm font-medium text-gray-300 mb-3">Simple</h4>
                         <AvatarDisplay
                           avatarId={selectedAvatar}
                           size={80}
@@ -147,7 +147,7 @@ export default function AvatarDemo() {
                         />
                       </div>
                       <div className="text-center">
-                        <h4 className="text-sm font-medium text-gray-700 mb-3">Compact</h4>
+                        <h4 className="text-sm font-medium text-gray-300 mb-3">Compact</h4>
                         <AvatarDisplay
                           avatarId={selectedAvatar}
                           size={60}
@@ -158,7 +158,7 @@ export default function AvatarDemo() {
                         />
                       </div>
                       <div className="text-center">
-                        <h4 className="text-sm font-medium text-gray-700 mb-3">Card</h4>
+                        <h4 className="text-sm font-medium text-gray-300 mb-3">Card</h4>
                         <AvatarDisplay
                           avatarId={selectedAvatar}
                           size={80}
@@ -175,8 +175,8 @@ export default function AvatarDemo() {
               </div>
 
               {/* Avatar Sizes Demo */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-md p-6">
+                <h3 className="text-xl font-semibold text-white mb-6">
                   Size Variations
                 </h3>
                 {selectedAvatar && (
@@ -189,7 +189,7 @@ export default function AvatarDemo() {
                           variant="simple"
                           className="mb-2"
                         />
-                        <p className="text-xs text-gray-500">{size}px</p>
+                        <p className="text-xs text-gray-400">{size}px</p>
                       </div>
                     ))}
                   </div>
@@ -197,14 +197,14 @@ export default function AvatarDemo() {
               </div>
 
               {/* Technical Information */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-md p-6">
+                <h3 className="text-xl font-semibold text-white mb-6">
                   System Features
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Avatar Components</h4>
-                    <ul className="text-sm text-gray-600 space-y-1">
+                    <h4 className="font-medium text-white mb-3">Avatar Components</h4>
+                    <ul className="text-sm text-gray-300 space-y-1">
                       <li>✅ 6 Hand-crafted SVG Avatars</li>
                       <li>✅ Unified Avatar Component</li>
                       <li>✅ Avatar Selector Interface</li>
@@ -214,8 +214,8 @@ export default function AvatarDemo() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Technical Features</h4>
-                    <ul className="text-sm text-gray-600 space-y-1">
+                    <h4 className="font-medium text-white mb-3">Technical Features</h4>
+                    <ul className="text-sm text-gray-300 space-y-1">
                       <li>✅ TypeScript Support</li>
                       <li>✅ React Hooks Integration</li>
                       <li>✅ LocalStorage Persistence</li>
@@ -231,8 +231,8 @@ export default function AvatarDemo() {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-12 p-6 bg-white rounded-lg shadow-md">
-          <p className="text-gray-600">
+        <div className="text-center mt-12 p-6 bg-gray-800 border border-gray-700 rounded-lg shadow-md">
+          <p className="text-gray-300">
             This avatar system represents approximately 6 hours of development work,
             including SVG design, component architecture, state management, and UI polish.
           </p>

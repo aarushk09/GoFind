@@ -220,7 +220,7 @@ export default function RoomDemo() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       {currentView !== 'overview' && renderNavigationHeader()}
       
       <div className="py-8">
