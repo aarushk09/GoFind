@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { createShareableResult, getHostShareableResults, ShareableGameResult } from '@/services/shareService'
 
 interface GameResult {
   id: string
@@ -26,6 +27,10 @@ export default function ResultsPage() {
   const router = useRouter()
   const [pastGames, setPastGames] = useState<GameResult[]>([])
   const [selectedGame, setSelectedGame] = useState<GameResult | null>(null)
+  const [shareableResults, setShareableResults] = useState<ShareableGameResult[]>([])
+  const [sharingGame, setSharingGame] = useState<string | null>(null)
+  const [shareError, setShareError] = useState<string | null>(null)
+  const [shareSuccess, setShareSuccess] = useState<string | null>(null)
 
   // Sample data - replace with actual API call
   useEffect(() => {
@@ -76,7 +81,64 @@ export default function ResultsPage() {
       }
     ]
     setPastGames(sampleGames)
-  }, [])
+    
+    // Load shareable results if user is authenticated
+    const loadShareableResults = async () => {
+      if (user) {
+        const { results } = await getHostShareableResults(user.id)
+        if (results) {
+          setShareableResults(results)
+        }
+      }
+    }
+    
+    loadShareableResults()
+  }, [user])
+
+  const handleCreateShareableLink = async (game: GameResult) => {
+    if (!user) return
+    
+    setSharingGame(game.id)
+    setShareError(null)
+    setShareSuccess(null)
+    
+    try {
+      const { shareUrl, error } = await createShareableResult(
+        game.room_code,
+        user.id,
+        {
+          players: game.players,
+          duration: game.duration,
+          host_name: user.user_metadata?.name || user.email || 'Unknown Host'
+        }
+      )
+      
+      if (error) {
+        setShareError(error)
+      } else if (shareUrl) {
+        // Copy to clipboard
+        await navigator.clipboard.writeText(shareUrl)
+        setShareSuccess(`Shareable link created and copied to clipboard!`)
+        
+        // Reload shareable results
+        const { results } = await getHostShareableResults(user.id)
+        if (results) {
+          setShareableResults(results)
+        }
+      }
+    } catch (error) {
+      setShareError('Failed to create shareable link')
+    } finally {
+      setSharingGame(null)
+    }
+  }
+
+  const copyShareableLink = async (shareToken: string) => {
+    const shareUrl = `${window.location.origin}/share/${shareToken}`
+    await navigator.clipboard.writeText(shareUrl)
+    setShareSuccess('Link copied to clipboard!')
+    setTimeout(() => setShareSuccess(null), 3000)
+  }
 
   useEffect(() => {
     if (!loading && !user) {
@@ -142,33 +204,109 @@ export default function ResultsPage() {
       </nav>
 
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Success/Error Messages */}
+        {shareSuccess && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center">
+              <span className="text-green-600 mr-2">✅</span>
+              <span className="text-green-800">{shareSuccess}</span>
+            </div>
+          </div>
+        )}
+        
+        {shareError && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center">
+              <span className="text-red-600 mr-2">❌</span>
+              <span className="text-red-800">{shareError}</span>
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">{/* Shared Links Section */}
+          {shareableResults.length > 0 && (
+            <div className="lg:col-span-3 mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">📤 Shared Game Results</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {shareableResults.map((result) => (
+                  <div key={result.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-gray-900 text-sm">{result.title}</h3>
+                      <span className="text-xs text-gray-500">{result.room_code}</span>
+                    </div>
+                    <p className="text-xs text-gray-600 mb-3">
+                      {new Date(result.date).toLocaleDateString()} • {result.players.length} players
+                    </p>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => copyShareableLink(result.share_token)}
+                        className="flex-1 px-3 py-1 bg-blue-50 text-blue-600 rounded text-xs font-medium hover:bg-blue-100 transition-colors"
+                      >
+                        📋 Copy Link
+                      </button>
+                      <Link
+                        href={`/share/${result.share_token}`}
+                        target="_blank"
+                        className="px-3 py-1 bg-gray-50 text-gray-600 rounded text-xs font-medium hover:bg-gray-100 transition-colors"
+                      >
+                        👁️ View
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           {/* Past Games List */}
           <div className="lg:col-span-1">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Past Games</h2>
             <div className="space-y-4">
               {pastGames.map((game) => (
-                <button
-                  key={game.id}
-                  onClick={() => setSelectedGame(game)}
-                  className={`w-full text-left p-4 rounded-lg border transition-all ${
-                    selectedGame?.id === game.id
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200 bg-white hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-gray-900">{game.title}</h3>
-                    <span className="text-xs text-gray-500">{game.room_code}</span>
+                <div key={game.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <button
+                    onClick={() => setSelectedGame(game)}
+                    className={`w-full text-left p-4 transition-all ${
+                      selectedGame?.id === game.id
+                        ? 'bg-purple-50'
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-gray-900">{game.title}</h3>
+                      <span className="text-xs text-gray-500">{game.room_code}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {new Date(game.date).toLocaleDateString()}
+                    </p>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">{game.players.length} players</span>
+                      <span className="text-gray-500">{game.duration}</span>
+                    </div>
+                  </button>
+                  
+                  {/* Share Button */}
+                  <div className="px-4 pb-3 border-t border-gray-100">
+                    <button
+                      onClick={() => handleCreateShareableLink(game)}
+                      disabled={sharingGame === game.id}
+                      className="w-full mt-3 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-sm font-medium hover:from-blue-600 hover:to-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {sharingGame === game.id ? (
+                        <span className="flex items-center justify-center">
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Creating...
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center">
+                          🔗 Create Shareable Link
+                        </span>
+                      )}
+                    </button>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {new Date(game.date).toLocaleDateString()}
-                  </p>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">{game.players.length} players</span>
-                    <span className="text-gray-500">{game.duration}</span>
-                  </div>
-                </button>
+                </div>
               ))}
             </div>
           </div>
@@ -178,15 +316,38 @@ export default function ResultsPage() {
             {selectedGame ? (
               <div className="bg-white rounded-xl shadow-lg p-8">
                 <div className="mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">{selectedGame.title}</h2>
-                  <div className="flex items-center space-x-4 text-gray-600">
-                    <span>Room: {selectedGame.room_code}</span>
-                    <span>•</span>
-                    <span>{new Date(selectedGame.date).toLocaleDateString()}</span>
-                    <span>•</span>
-                    <span>Duration: {selectedGame.duration}</span>
-                    <span>•</span>
-                    <span>{selectedGame.players.length} players</span>
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h2 className="text-3xl font-bold text-gray-900 mb-2">{selectedGame.title}</h2>
+                      <div className="flex items-center space-x-4 text-gray-600">
+                        <span>Room: {selectedGame.room_code}</span>
+                        <span>•</span>
+                        <span>{new Date(selectedGame.date).toLocaleDateString()}</span>
+                        <span>•</span>
+                        <span>Duration: {selectedGame.duration}</span>
+                        <span>•</span>
+                        <span>{selectedGame.players.length} players</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleCreateShareableLink(selectedGame)}
+                      disabled={sharingGame === selectedGame.id}
+                      className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {sharingGame === selectedGame.id ? (
+                        <span className="flex items-center">
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Creating...
+                        </span>
+                      ) : (
+                        <span className="flex items-center">
+                          🔗 Share Results
+                        </span>
+                      )}
+                    </button>
                   </div>
                 </div>
 
@@ -206,7 +367,7 @@ export default function ResultsPage() {
                             <div className="w-16 h-16 mx-auto rounded-full overflow-hidden border-4 border-white shadow-lg">
                               {player.avatar === 'gofind_1' ? (
                                 <Image
-                                  src="/gofind_1.png"
+                                  src="/avatars/gofind_1.png"
                                   alt={player.name}
                                   width={64}
                                   height={64}

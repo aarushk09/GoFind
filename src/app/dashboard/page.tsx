@@ -84,6 +84,9 @@ export default function DashboardPage() {
                 <Link href="/results" className="text-green-400 hover:text-green-300 text-sm font-medium transition-colors">
                   Results
                 </Link>
+                <Link href="/share-demo" className="text-yellow-400 hover:text-yellow-300 text-sm font-medium transition-colors">
+                  Share Demo
+                </Link>
                 <button
                   onClick={handleSignOut}
                   className="bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border border-red-500/30"
