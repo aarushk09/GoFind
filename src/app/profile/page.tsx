@@ -180,6 +180,14 @@ export default function ProfilePage() {
                           height={64}
                           className="rounded-lg"
                         />
+                      ) : avatar === 'gofind_2' ? (
+                        <Image
+                          src="/avatars/gofind_2.png"
+                          alt="GoFind Avatar 2"
+                          width={64}
+                          height={64}
+                          className="rounded-lg"
+                        />
                       ) : (
                         <div className="text-xs text-gray-600 text-center p-1">
                           {avatar}

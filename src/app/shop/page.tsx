@@ -18,14 +18,14 @@ export default function ShopPage() {
       name: 'Dinosaur Friend',
       price: 0,
       owned: true,
-      image: '/avatars/gofind_1.png'
+      image: '/gofind_1.png'
     },
     {
       id: 'gofind_2',
       name: 'Cool Cat',
       price: 100,
       owned: false,
-      placeholder: true
+      image: '/avatars/gofind_2.png'
     },
     {
       id: 'gofind_3',

@@ -71,6 +71,9 @@ export default function DashboardPage() {
               <Link href="/shop" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
                 Shop
               </Link>
+              <Link href="/results" className="text-green-600 hover:text-green-700 text-sm font-medium">
+                Results
+              </Link>
               <button
                 onClick={handleSignOut}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
@@ -299,4 +302,10 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+
+
+
+
+
 
