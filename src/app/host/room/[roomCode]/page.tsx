@@ -4,20 +4,49 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { getRoomByCode, updateRoomStatus } from '@/services/roomService'
+import { getPlayersInRoom } from '@/services/playerService'
 import { formatRoomCode } from '@/utils/roomCode'
 import { Room } from '@/types/room'
+import { Player } from '@/types/player'
 
 export default function RoomLobbyPage() {
   const [room, setRoom] = useState<Room | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
-  const [players, setPlayers] = useState<any[]>([]) // Will be populated when player system is built
+  const [players, setPlayers] = useState<Player[]>([])
+  const [playersLoading, setPlayersLoading] = useState(false)
+  const [playersError, setPlayersError] = useState<string | null>(null)
   
   const params = useParams()
   const router = useRouter()
   const { user } = useAuth()
   const roomCode = params.roomCode as string
+
+  // Function to load players
+  const loadPlayers = async () => {
+    if (!roomCode) return
+    
+    setPlayersLoading(true)
+    setPlayersError(null)
+    
+    try {
+      const result = await getPlayersInRoom(roomCode)
+      if (result.error) {
+        setPlayersError(result.error)
+        console.error('Error loading players:', result.error)
+      } else if (result.players) {
+        setPlayers(result.players)
+        console.log(`📋 Loaded ${result.players.length} players for room ${roomCode}`)
+      }
+    } catch (error) {
+      console.error('Error loading players:', error)
+      setPlayersError('Failed to load players')
+    } finally {
+      setPlayersLoading(false)
+    }
+  }
+
   useEffect(() => {
     if (!user) {
       router.push('/auth/login')
@@ -40,16 +69,31 @@ export default function RoomLobbyPage() {
             return
           }
           setRoom(result.room)
+          
+          // Load players after room is loaded
+          loadPlayers()
         }
       } catch (error) {
         console.error('Error loading room:', error)
         setError('Failed to load room')
-      } finally {        setLoading(false)
+      } finally {
+        setLoading(false)
       }
     }
 
     loadRoom()
   }, [user, roomCode, router])
+
+  // Auto-refresh players every 5 seconds
+  useEffect(() => {
+    if (!room) return
+
+    const interval = setInterval(() => {
+      loadPlayers()
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [room, roomCode])
 
   const copyRoomCode = async () => {
     try {
@@ -224,7 +268,7 @@ export default function RoomLobbyPage() {
                     <p className="text-sm text-gray-500">
                       Players can join at{' '}
                       <span className="font-medium text-gray-900">
-                        {window.location.origin}/join
+                        {typeof window !== 'undefined' ? window.location.origin : ''}/join
                       </span>
                     </p>
                   </div>
@@ -268,9 +312,33 @@ export default function RoomLobbyPage() {
               {/* Players List */}
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                    Players ({players.length}/{room.metadata?.max_players})
-                  </h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">
+                      Players ({players.length}/{room.metadata?.max_players})
+                    </h3>
+                    <button
+                      onClick={loadPlayers}
+                      disabled={playersLoading}
+                      className="text-sm text-blue-600 hover:text-blue-500 disabled:text-gray-400"
+                    >
+                      {playersLoading ? (
+                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  
+                  {playersError && (
+                    <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3">
+                      <p className="text-red-600 text-sm">{playersError}</p>
+                    </div>
+                  )}
                   
                   {players.length === 0 ? (
                     <div className="text-center py-8">
@@ -285,13 +353,39 @@ export default function RoomLobbyPage() {
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-2">
-                      {players.map((player, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                          <span className="text-sm font-medium">{player.name}</span>
-                          <span className="text-xs text-gray-500">Connected</span>
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                      {players.map((player) => (
+                        <div key={player.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                              <span className="text-white text-sm font-medium">
+                                {player.player_name.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{player.player_name}</p>
+                              <p className="text-xs text-gray-500">
+                                Joined {new Date(player.joined_at).toLocaleTimeString()}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              player.status === 'joined' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-gray-100 text-gray-800'
+                            }`}>
+                              {player.status}
+                            </span>
+                          </div>
                         </div>
                       ))}
+                    </div>
+                  )}
+                  
+                  {players.length > 0 && (
+                    <div className="mt-4 text-xs text-gray-500 text-center">
+                      Auto-refreshing every 5 seconds
                     </div>
                   )}
                 </div>

@@ -74,3 +74,12 @@ export async function createRoomsTableIfNotExists(): Promise<{ success: boolean;
     }
   }
 }
+
+
+
+
+
+
+
+
+
