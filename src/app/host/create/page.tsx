@@ -104,12 +104,12 @@ export default function CreateRoomPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white shadow rounded-lg">
+        <div className="bg-gray-800 border border-gray-700 shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">            <div className="mb-8">
-              <h1 className="text-3xl font-extrabold text-gray-900">Create a New Hunt</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-3xl font-extrabold text-white">Create a New Hunt</h1>
+              <p className="mt-2 text-gray-300">
                 Set up your AI scavenger hunt session and get a room code to share with players.
               </p>
             </div>
