@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { createRoom } from '@/services/roomService'
 import { testDatabaseConnection } from '@/services/databaseTest'
@@ -104,385 +105,201 @@ export default function CreateRoomPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-gray-800 border border-gray-700 shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">            <div className="mb-8">
-              <h1 className="text-3xl font-extrabold text-white">Create a New Hunt</h1>
-              <p className="mt-2 text-gray-300">
-                Set up your AI scavenger hunt session and get a room code to share with players.
-              </p>
+    <div className="min-h-screen bg-gray-950">
+      {/* Navigation */}
+      <nav className="border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/dashboard" className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <span className="text-xl font-semibold text-white">GoFind</span>
+            </Link>
+            <Link
+              href="/dashboard"
+              className="text-gray-400 hover:text-white text-sm transition-colors"
+            >
+              Back to Dashboard
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">Create New Hunt</h1>
+          <p className="text-gray-400">
+            Set up your scavenger hunt session and get a room code to share with players.
+          </p>
+        </div>
+
+        {/* Database Status Indicator */}
+        {dbStatus === 'checking' && (
+          <div className="mb-6 bg-blue-900/20 border border-blue-800 rounded-lg p-4">
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400 mr-3"></div>
+              <p className="text-sm text-blue-300">Checking database connection...</p>
             </div>
+          </div>
+        )}
 
-            {/* Database Status Indicator */}
-            {dbStatus === 'checking' && (
-              <div className="mb-6 rounded-md bg-blue-50 p-4">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-blue-700">Checking database connection...</p>
-                  </div>
-                </div>
+        {dbStatus === 'error' && (
+          <div className="mb-6 bg-yellow-900/20 border border-yellow-800 rounded-lg p-4">
+            <div className="flex">
+              <svg className="h-5 w-5 text-yellow-400 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <div>
+                <h3 className="text-sm font-medium text-yellow-300">Database Setup Required</h3>
+                <p className="mt-1 text-sm text-yellow-400">
+                  Please set up your Supabase database tables before creating rooms.
+                </p>
               </div>
-            )}
-
-            {dbStatus === 'error' && (
-              <div className="mb-6 rounded-md bg-yellow-50 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-yellow-800">Database Setup Required</h3>
-                    <p className="mt-1 text-sm text-yellow-700">
-                      Please set up your Supabase database tables before creating rooms. 
-                      <a href="/SETUP.md" target="_blank" className="font-medium underline ml-1">
-                        View setup guide
-                      </a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <div className="mb-6 rounded-md bg-red-50 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">Error</h3>
-                    <p className="mt-1 text-sm text-red-700">{error}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-8">
-              {/* Quick Start Option */}
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-                <div className="space-y-4">
-                  <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
-                    <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">Quick Start</h3>
-                    <p className="text-sm text-gray-500">Start a hunt immediately with default settings</p>
-                  </div>                  <button
-                    onClick={handleQuickStart}
-                    disabled={isLoading || dbStatus !== 'ready'}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? 'Creating...' : 'Quick Start Hunt'}
-                  </button>
-                </div>
-              </div>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">Or customize your hunt</span>
-                </div>
-              </div>
-
-              {/* Custom Room Form */}
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                    Hunt Title
-                  </label>
-                  <input
-                    type="text"
-                    name="title"
-                    id="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="My Awesome Scavenger Hunt"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                    Description
-                  </label>
-                  <textarea
-                    name="description"
-                    id="description"
-                    rows={3}
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="Describe what players will be searching for..."
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="max_players" className="block text-sm font-medium text-gray-700">
-                      Max Players
-                    </label>
-                    <select
-                      name="max_players"
-                      id="max_players"
-                      value={formData.max_players}
-                      onChange={handleChange}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    >
-                      <option value={10}>10 players</option>
-                      <option value={25}>25 players</option>
-                      <option value={50}>50 players</option>
-                      <option value={100}>100 players</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label htmlFor="time_limit" className="block text-sm font-medium text-gray-700">
-                      Time Limit (minutes)
-                    </label>
-                    <select
-                      name="time_limit"
-                      id="time_limit"
-                      value={formData.time_limit}
-                      onChange={handleChange}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    >
-                      <option value={10}>10 minutes</option>
-                      <option value={15}>15 minutes</option>
-                      <option value={30}>30 minutes</option>
-                      <option value={45}>45 minutes</option>
-                      <option value={60}>60 minutes</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => router.back()}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isLoading || dbStatus !== 'ready'}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? 'Creating Hunt...' : 'Create Hunt Room'}
-                  </button>
-                </div>
-              </form>
             </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-6 bg-red-900/20 border border-red-800 rounded-lg p-4">
+            <div className="flex">
+              <svg className="h-5 w-5 text-red-400 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <div>
+                <h3 className="text-sm font-medium text-red-300">Error</h3>
+                <p className="mt-1 text-sm text-red-400">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-8">
+          {/* Quick Start Option */}
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+            <div className="text-center space-y-4">
+              <div className="w-12 h-12 bg-green-600/10 rounded-lg flex items-center justify-center mx-auto">
+                <svg className="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-white">Quick Start</h3>
+                <p className="text-sm text-gray-400">Start a hunt immediately with default settings</p>
+              </div>
+              <button
+                onClick={handleQuickStart}
+                disabled={isLoading || dbStatus !== 'ready'}
+                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white px-6 py-2 rounded-md font-medium transition-colors"
+              >
+                {isLoading ? 'Creating...' : 'Quick Start Hunt'}
+              </button>
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-800" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gray-950 text-gray-500">Or customize your hunt</span>
+            </div>
+          </div>
+
+          {/* Custom Room Form */}
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-2">
+                  Hunt Title
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 bg-gray-950 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="Enter hunt title"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-2">
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full px-3 py-2 bg-gray-950 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="Describe your hunt..."
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="max_players" className="block text-sm font-medium text-gray-300 mb-2">
+                    Max Players
+                  </label>
+                  <select
+                    id="max_players"
+                    name="max_players"
+                    value={formData.max_players}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-gray-950 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  >
+                    <option value={10}>10 players</option>
+                    <option value={25}>25 players</option>
+                    <option value={50}>50 players</option>
+                    <option value={100}>100 players</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="time_limit" className="block text-sm font-medium text-gray-300 mb-2">
+                    Time Limit (minutes)
+                  </label>
+                  <select
+                    id="time_limit"
+                    name="time_limit"
+                    value={formData.time_limit}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-gray-950 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  >
+                    <option value={15}>15 minutes</option>
+                    <option value={30}>30 minutes</option>
+                    <option value={45}>45 minutes</option>
+                    <option value={60}>60 minutes</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex space-x-4">
+                <button
+                  type="submit"
+                  disabled={isLoading || dbStatus !== 'ready'}
+                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md font-medium transition-colors"
+                >
+                  {isLoading ? 'Creating Hunt...' : 'Create Hunt'}
+                </button>
+                <Link
+                  href="/dashboard"
+                  className="px-6 py-2 border border-gray-700 hover:border-gray-600 text-gray-300 rounded-md font-medium transition-colors inline-flex items-center justify-center"
+                >
+                  Cancel
+                </Link>
+              </div>
+            </form>
           </div>
         </div>
       </div>
     </div>
   )
 }
-
-export default function Page() {
-console.log("Hello, world!");
-function greet(name: string): string {
-const fetchData = async (): Promise<void> => {
-  return (<div>Dashboard</div>);
-function greet(name: string): string {
-interface User { id: number; name: string; }
-return name.toUpperCase();
-console.log("Hello, world!");
-  return (<div>Dashboard</div>);
-return name.toUpperCase();
-export default function Page() {
-}
-}
-interface User { id: number; name: string; }
-return name.toUpperCase();
-const fetchData = async (): Promise<void> => {
-};
-function greet(name: string): string {
-function greet(name: string): string {
-let userName: string = "testUser";
-const fetchData = async (): Promise<void> => {
-console.log("Hello, world!");
-const fetchData = async (): Promise<void> => {
-let userName: string = "testUser";
-  return (<div>Dashboard</div>);
-console.log("Hello, world!");
-let userName: string = "testUser";
-const fetchData = async (): Promise<void> => {
-}
-  return (<div>Dashboard</div>);
-interface User { id: number; name: string; }
-  return (<div>Dashboard</div>);
-}
-let userName: string = "testUser";
-return name.toUpperCase();
-};
-const fetchData = async (): Promise<void> => {
-let userName: string = "testUser";
-const fetchData = async (): Promise<void> => {
-function greet(name: string): string {
-}
-export default function Page() {
-console.log("Hello, world!");
-  return (<div>Dashboard</div>);
-export default function Page() {
-interface User { id: number; name: string; }
-return name.toUpperCase();
-  return (<div>Dashboard</div>);
-export default function Page() {
-}
-export default function Page() {
-return name.toUpperCase();
-function greet(name: string): string {
-console.log("Hello, world!");
-  return (<div>Dashboard</div>);
-return name.toUpperCase();
-}
-};
-const fetchData = async (): Promise<void> => {
-interface User { id: number; name: string; }
-}
-return name.toUpperCase();
-const fetchData = async (): Promise<void> => {
-export default function Page() {
-  return (<div>Dashboard</div>);
-return name.toUpperCase();
-export default function Page() {
-console.log("Hello, world!");
-  return (<div>Dashboard</div>);
-let userName: string = "testUser";
-interface User { id: number; name: string; }
-};
-interface User { id: number; name: string; }
-let userName: string = "testUser";
-return name.toUpperCase();
-function greet(name: string): string {
-}
-let userName: string = "testUser";
-function greet(name: string): string {
-  return (<div>Dashboard</div>);
-function greet(name: string): string {
-  return (<div>Dashboard</div>);
-  return (<div>Dashboard</div>);
-const fetchData = async (): Promise<void> => {
-  return (<div>Dashboard</div>);
-  return (<div>Dashboard</div>);
-};
-const fetchData = async (): Promise<void> => {
-function greet(name: string): string {
-};
-};
-const fetchData = async (): Promise<void> => {
-let userName: string = "testUser";
-function greet(name: string): string {
-console.log("Hello, world!");
-const fetchData = async (): Promise<void> => {
-interface User { id: number; name: string; }
-}
-console.log("Hello, world!");
-const fetchData = async (): Promise<void> => {
-};
-export default function Page() {
-function greet(name: string): string {
-};
-export default function Page() {
-const fetchData = async (): Promise<void> => {
-}
-};
-interface User { id: number; name: string; }
-let userName: string = "testUser";
-console.log("Hello, world!");
-const fetchData = async (): Promise<void> => {
-};
-let userName: string = "testUser";
-function greet(name: string): string {
-function greet(name: string): string {
-console.log("Hello, world!");
-interface User { id: number; name: string; }
-console.log("Hello, world!");
-  return (<div>Dashboard</div>);
-export default function Page() {
-};
-let userName: string = "testUser";
-console.log("Hello, world!");
-const fetchData = async (): Promise<void> => {
-function greet(name: string): string {
-const fetchData = async (): Promise<void> => {
-let userName: string = "testUser";
-};
-interface User { id: number; name: string; }
-interface User { id: number; name: string; }
-  return (<div>Dashboard</div>);
-console.log("Hello, world!");
-}
-  return (<div>Dashboard</div>);
-export default function Page() {
-function greet(name: string): string {
-  return (<div>Dashboard</div>);
-};
-console.log("Hello, world!");
-function greet(name: string): string {
-}
-interface User { id: number; name: string; }
-console.log("Hello, world!");
-console.log("Hello, world!");
-let userName: string = "testUser";
-export default function Page() {
-};
-console.log("Hello, world!");
-  return (<div>Dashboard</div>);
-  return (<div>Dashboard</div>);
-interface User { id: number; name: string; }
-console.log("Hello, world!");
-export default function Page() {
-};
-  return (<div>Dashboard</div>);
-  return (<div>Dashboard</div>);
-console.log("Hello, world!");
-}
-export default function Page() {
-const fetchData = async (): Promise<void> => {
-}
-let userName: string = "testUser";
-return name.toUpperCase();
-const fetchData = async (): Promise<void> => {
-};
-const fetchData = async (): Promise<void> => {
-interface User { id: number; name: string; }
-console.log("Hello, world!");
-const fetchData = async (): Promise<void> => {
-export default function Page() {
-function greet(name: string): string {
-let userName: string = "testUser";
-};
-};
-}
-}
-}
-export default function Page() {
-};
-  return (<div>Dashboard</div>);
-interface User { id: number; name: string; }
-  return (<div>Dashboard</div>);
-}
-export default function Page() {
-interface User { id: number; name: string; }
-return name.toUpperCase();
-  return (<div>Dashboard</div>);
-}
-console.log("Hello, world!");
-return name.toUpperCase();
-let userName: string = "testUser";
-let
